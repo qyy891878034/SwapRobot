@@ -888,9 +888,9 @@ contract Apple {
 
     function addDestroyRecord(address user, uint256 qty) internal {
         _destroyRecord.push(DestroyInfo({
-        user: user,
-        time: block.timestamp,
-        qty: qty
+            user: user,
+            time: block.timestamp,
+            qty: qty
         }));
     }
 
