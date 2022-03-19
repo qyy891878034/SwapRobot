@@ -33,7 +33,6 @@ public class AdminRedisController extends BaseController {
         Map<String, String> map = new HashMap<String, String>();
         map.put(KeyConstant.KEY_USER_AUTH, "验证码,例如：" + KeyConstant.KEY_USER_AUTH + "用户登录名");
         map.put(KeyConstant.KEY_ALL_PRICE, "所有价格");
-        map.put(KeyConstant.KEY_CTC_PRICE, "ctc价格,例如：" + KeyConstant.KEY_CTC_PRICE + "ctc配置id");
         map.put(KeyConstant.KEY_CTC_NUM, "ctc编号");
         map.put(KeyConstant.KEY_OTC_NUM, "otc编号");
         map.put(KeyConstant.KEY_WORK_NUM, "工单编号");

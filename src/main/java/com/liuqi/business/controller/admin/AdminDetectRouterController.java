@@ -26,17 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/detectContract")
-public class AdminDetectContractController {
+@RequestMapping("/admin/detectRouter")
+public class AdminDetectRouterController {
 
     @Autowired
     private RedisRepository redisRepository;
-    @Autowired
-    private BlockChainService blockChainService;
     //jsp基础路径
     private final static String JSP_BASE_PTH = "admin";
     //模块
-    private final static String BASE_MODUEL = "detectContract";
+    private final static String BASE_MODUEL = "detectRouter";
     //默认为""表示可以使用add和update。  重写add或update时，原有方法禁止使用 NOT_OPERATE="add,update"
 
     /*******待修改  排序  导出**********************************************************************************************************/
@@ -85,19 +83,19 @@ public class AdminDetectContractController {
     @RequestMapping("/add")
     @ResponseBody
     public ReturnResponse add(@CurAdminId Long adminId, @Validated(AdminValid.class) DetectContractDto t, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
-        t.setContractAddress(t.getContractAddress().toLowerCase());
-        if (redisRepository.hHasKey(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getContractAddress())) {
+        t.setRouterContract(t.getRouterContract().toLowerCase());
+        if (redisRepository.hHasKey(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getRouterContract())) {
             return ReturnResponse.backFail("已有此合约");
         }
-        redisRepository.hset(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getContractAddress(), t);
+        redisRepository.hset(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getRouterContract(), t);
         return ReturnResponse.backSuccess();
     }
 
 
     @RequestMapping("/toUpdate")
     public String toUpdate(HttpServletRequest request, HttpServletResponse response, ModelMap modelMap, String chainName,
-                           String contractAddress) {
-        DetectContractDto m = redisRepository.hGetModel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + chainName, contractAddress);
+                           String routerContract) {
+        DetectContractDto m = redisRepository.hGetModel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + chainName, routerContract);
         modelMap.put("m", m);
         modelMap.put("chainList", getChainNameList());
         return JSP_BASE_PTH + "/" + BASE_MODUEL + "/" + BASE_MODUEL + "Update";
@@ -105,22 +103,22 @@ public class AdminDetectContractController {
 
     @RequestMapping("/update")
     @ResponseBody
-    public ReturnResponse update(@CurAdminId Long adminId, String originChainName, String originContractAddress,
+    public ReturnResponse update(@CurAdminId Long adminId, String originChainName, String originRouterContract,
                                  @Validated(AdminValid.class) DetectContractDto t, BindingResult bindingResult, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
-        DetectContractDto m = redisRepository.hGetModel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + originChainName, originContractAddress);
-        redisRepository.hdel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + originChainName, originContractAddress);
-        if (redisRepository.hHasKey(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getContractAddress())) {
+        DetectContractDto m = redisRepository.hGetModel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + originChainName, originRouterContract);
+        redisRepository.hdel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + originChainName, originRouterContract);
+        if (redisRepository.hHasKey(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getRouterContract())) {
             return ReturnResponse.backFail("已有此合约");
         }
-        redisRepository.hset(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getContractAddress(), t);
+        redisRepository.hset(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + t.getChainName(), t.getRouterContract(), t);
         return ReturnResponse.backSuccess();
     }
 
     @RequestMapping("/delete")
     @ResponseBody
-    public ReturnResponse delete(@CurAdminId Long adminId, String chainName, String contractAddress,
+    public ReturnResponse delete(@CurAdminId Long adminId, String chainName, String routerContract,
                                  ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
-        redisRepository.hdel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + chainName, contractAddress);
+        redisRepository.hdel(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + chainName, routerContract);
         return ReturnResponse.backSuccess();
     }
 

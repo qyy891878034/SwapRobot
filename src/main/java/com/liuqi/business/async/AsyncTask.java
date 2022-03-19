@@ -26,11 +26,11 @@ public class AsyncTask {
     private UserAdminLoginService userAdminLoginService;
 
     public void addAdminLoginLog(HttpServletRequest request,String loginName,String remark){
-        if(StringUtils.isEmpty(remark)){
-            remark="-";
-        }
-        String ip= IpUtils.getIpAddr(request);
-        String city=IpUtils.getCity(ip);
-        userAdminLoginService.addLog(loginName,ip,city,remark);
+//        if(StringUtils.isEmpty(remark)){
+//            remark="-";
+//        }
+//        String ip= IpUtils.getIpAddr(request);
+//        String city=IpUtils.getCity(ip);
+//        userAdminLoginService.addLog(loginName,ip,city,remark);
     }
 }

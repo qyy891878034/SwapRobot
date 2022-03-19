@@ -44,8 +44,11 @@ public class KeyConstant {
     // 已投过的链 - 地址 - 合约
     public static final String KEY_CLAMPED_CHAIN_ADDRESS = "key:clamped:chain:address:";
 
+    // 已投过的链 - 地址 - 合约
+    public static final String KEY_ROUTER_2_ROBOT_CONTRACT_MAP = "key:router:2:robot:contract:";
 
-    public static final String KEY_CTC_PRICE = "key:ctc:price:";
+
+    public static final String KEY_START_APP = "key:start:app";
     public static final String KEY_CTC_NUM = "key:ctc:num:";
     public static final String KEY_OTC_NUM = "key:otc:num:";
     public static final String KEY_WORK_NUM = "key:work:num:";

@@ -11,6 +11,6 @@ public class DetectContractDto implements Serializable {
 
     private String chainName;// 监控的链
 
-    private String contractAddress;// 监控的Swap路由地址
+    private String routerContract;// 监控的Swap路由地址
 
 }

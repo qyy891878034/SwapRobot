@@ -53,11 +53,11 @@
 
         table.render({
             elem: '#currentTableId',
-            url: '/admin/detectContract/queryList',
+            url: '/admin/detectRouter/queryList',
             cols: [[
                 {type: "checkbox", width: 30, align: "center", fixed: "left"},
                 {field: 'chainName', title: '链名称', align: "center"},
-                {field: 'contractAddress', title: '合约地址', align: "center"},
+                {field: 'routerContract', title: '路由合约', align: "center"},
                 {title: '操作', width: '10%', templet: '#currentTableBar', fixed: "right", align: "center"}
             ]],
             height: table_height,
@@ -85,16 +85,16 @@
         // 监听添加操作
         $(".data-add-btn").on("click", function () {
             //参数    url，参数，标题，宽度%（默认70%），高度%（默认70%）
-            liuQi.openDialog('/admin/detectContract/toAdd', {}, "添加address", '', '60');
+            liuQi.openDialog('/admin/detectRouter/toAdd', {}, "添加address", '', '60');
         });
 
         table.on('tool(currentTableFilter)', function (obj) {
             var data = obj.data;
             if (obj.event === 'edit') {
                 //参数    url，参数，标题，宽度%（默认70%），高度%（默认70%）
-                liuQi.openDialog('/admin/detectContract/toUpdate', {"chainName": data.chainName, "contractAddress": data.contractAddress}, "编辑address", '', '');
+                liuQi.openDialog('/admin/detectRouter/toUpdate', {"chainName": data.chainName, "routerContract": data.routerContract}, "编辑address", '', '');
             } else if (obj.event === 'delete') {
-                liuQi.ajaxRefreshTable('/admin/detectContract/delete', {"chainName": data.chainName, "contractAddress": data.contractAddress}, "");
+                liuQi.ajaxRefreshTable('/admin/detectRouter/delete', {"chainName": data.chainName, "routerContract": data.routerContract}, "");
             }
         });
     });

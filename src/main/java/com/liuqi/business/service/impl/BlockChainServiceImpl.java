@@ -78,7 +78,7 @@ public class BlockChainServiceImpl implements BlockChainService {
     }
 
     private String getInput(String method, String params) {
-        return "0x" + BlockChainUtil.getMethodByte(method) + params;
+        return "0x" + method + params;
     }
 
     @Override
@@ -362,13 +362,9 @@ public class BlockChainServiceImpl implements BlockChainService {
     }
 
     public static void main(String[] args) {
-        System.out.println(new BigInteger("4247c39576ed31a00000", 16).divide(BigInteger.TEN.pow(18)));
-    }
-
-    public static void msdfsfain(String[] args) {
         String address = "0x16d211f3be093d4b484054364471d68dd02a6d82";
-        String contractAddress = "0x30317082426F032D83654C531306cE9e815a0c4f";
-//        String param1 = "0000000000000000000000000000000000000000000000000000000000000002";
+        String contractAddress = "0x6d5b44925e1118b6caba47148ca78a8f8b69bbb2";
+        String param1 = "000000000000000000000000000000000000000000000000000000000000008A";
 //        String param1 = "00000000000000000000000016d211f3be093d4b484054364471d68dd02a6d82";
 //        String param2 = "0000000000000000000000000000000000000000000000000000000000000040";
 //        String param3 = "0000000000000000000000000000000000000000000000000000000000000002";
@@ -377,15 +373,18 @@ public class BlockChainServiceImpl implements BlockChainService {
 
 
         String p = new BlockChainServiceImpl().getConstantData(address, contractAddress,
-                "destroySummary()",
-                "", "sdfsfd");
+//                "getStaticUnitProfitByHeight(uint256)",
+                "getDynamicUnitProfitByHeight(uint256)",
+                param1, "sdfsfd");
 //        System.out.println(p);
 
         String rr = HttpUtil.createPost("https://bsc.getblock.io/testnet/?api_key=44fae5f3-2303-41c8-a0a4-865c8ae5e7c0").
 //        String rr = HttpUtil.createPost("https://data-seed-prebsc-1-s1.binance.org:8545").
 //        String rr = HttpUtil.createPost("https://bsc-dataseed.binance.org").
         body(p).timeout(3000).execute().body();
-        System.out.println("卡牌检测结果=" + rr);
+        JSONObject jsonObject = JSONObject.parseObject(rr);
+        String result = jsonObject.getString("result");
+        System.out.println("卡牌检测结果=" + new BigDecimal(new BigInteger(result.substring(2), 16)).divide(BigDecimal.TEN.pow(18)));
 
 //        System.out.println(BlockChainUtil.getMethodByte("activeRecord(uint256,address[])"));
 

@@ -1,40 +1,29 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
-<head th:include="admin/head :: head" th:with="title=address添加">
+<head th:include="admin/head :: head" th:with="title=address编辑">
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
         <form class="layui-form" action="" lay-filter="formfilter">
             <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>链ID:</label>
+                <label class="layui-form-label">路由合约:</label>
                 <div class="layui-input-block">
-                    <input type="text" id="chainId" name="chainId" lay-verify="required|chainId" autocomplete="off"
-                           placeholder="链ID" class="layui-input">
+                    <select class="layui-select" lay-verify="required|routerContract" id="routerContract" name="routerContract">
+                        <option th:each="t,tState:${ routerContracts}" th:value="${t}" th:text="${t}" th:selected="${t == routerContract}" ></option>
+                    </select>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>链名称:</label>
+                <label class="layui-form-label"><span style="color: red">*</span>币合约:</label>
                 <div class="layui-input-block">
-                    <input type="text" id="chainName" name="chainName" lay-verify="required|chainName"
-                           autocomplete="off" placeholder="链名称" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>请求地址:</label>
-                <div class="layui-input-block">
-                    <input type="text" id="url" name="url" lay-verify="required|url"
-                           autocomplete="off" placeholder="请求地址" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>机器人私钥:</label>
-                <div class="layui-input-block">
-                    <input type="text" id="privateKey" name="privateKey" lay-verify="required|privateKey"
-                           autocomplete="off" placeholder="机器人私钥" class="layui-input">
+                    <input type="text" id="coinContract" name="coinContract" lay-verify="required|coinContract" autocomplete="off"
+                           class="layui-input" th:value="${ coinContract}">
                 </div>
             </div>
             <div class="layui-form-item">
                 <div class="layui-input-block">
+                    <input type="hidden" name="originChainName" th:value="${ chainName}">
+                    <input type="hidden" name="originContractAddress" th:value="${ m.contractAddress}">
                     <button class="layui-btn" lay-submit="" lay-filter="formSubmit">立即提交</button>
                 </div>
             </div>
@@ -43,13 +32,12 @@
 </div>
 
 <script>
-
-
     layui.use(['laydate', 'layer', 'jquery', 'liuQi'], function () {
         var form = layui.form,
             liuQi = layui.liuQi,
             laydate = layui.laydate;
 
+        //日期
         form.render();
 
         //自定义验证规则
@@ -73,19 +61,19 @@
                     return '必填项不能为空';
                 }
             },
-            chainId: function (value) {
+            originChainName: function (value) {
+            },
+            originContractAddress: function (value) {
             },
             chainName: function (value) {
             },
-            privateKey: function (value) {
-            },
-            url: function (value) {
+            contractAddress: function (value) {
             },
         })
         //监听提交
         form.on('submit(formSubmit)', function (data) {
             data = data.field;
-            liuQi.ajax("/admin/chainRequest/add", data,
+            liuQi.ajax("/admin/detectContract/update", data,
                 function (data) {
                     //关闭
                     parent.layer.msg(data.msg);

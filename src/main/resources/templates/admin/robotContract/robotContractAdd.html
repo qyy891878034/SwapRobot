@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
-<head th:include="admin/head :: head" th:with="title=address编辑">
+<head th:include="admin/head :: head" th:with="title=address添加">
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
         <form class="layui-form" action="" lay-filter="formfilter">
             <div class="layui-form-item">
-                <label class="layui-form-label">链名称:</label>
+                <label class="layui-form-label">路由合约地址:</label>
                 <div class="layui-input-block">
-                    <select class="layui-select" lay-verify="required|chainName" id="chainName" name="chainName">
-                        <option th:each="t,tState:${ chainList}" th:value="${t}" th:text="${t}" ></option>
+                    <select class="layui-select" lay-verify="required|routerContract" id="routerContract" name="routerContract">
+                        <option th:each="t,tState:${ routerContracts}" th:value="${t}" th:text="${t}" ></option>
                     </select>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>合约地址:</label>
+                <label class="layui-form-label">买入币合约地址:</label>
                 <div class="layui-input-block">
-                    <input type="text" id="contractAddress" name="contractAddress" lay-verify="required|contractAddress" autocomplete="off"
-                           class="layui-input" th:value="${ m.contractAddress}">
+                    <input type="text" id="coinContract" name="coinContract" lay-verify="required|coinContract"
+                           autocomplete="off" placeholder="买入币合约合约地址" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">稳定币合约[以|分隔]:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="stableContract" name="stableContract" lay-verify="required|stableContract"
+                           autocomplete="off" placeholder="稳定币合约" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
                 <div class="layui-input-block">
-                    <input type="hidden" name="originChainName" th:value="${ m.chainName}">
-                    <input type="hidden" name="originContractAddress" th:value="${ m.contractAddress}">
                     <button class="layui-btn" lay-submit="" lay-filter="formSubmit">立即提交</button>
                 </div>
             </div>
@@ -32,12 +37,13 @@
 </div>
 
 <script>
+
+
     layui.use(['laydate', 'layer', 'jquery', 'liuQi'], function () {
         var form = layui.form,
             liuQi = layui.liuQi,
             laydate = layui.laydate;
 
-        //日期
         form.render();
 
         //自定义验证规则
@@ -61,19 +67,17 @@
                     return '必填项不能为空';
                 }
             },
-            originChainName: function (value) {
+            routerContract: function (value) {
             },
-            originContractAddress: function (value) {
+            coinContract: function (value) {
             },
-            chainName: function (value) {
-            },
-            contractAddress: function (value) {
+            stableContract: function (value) {
             },
         })
         //监听提交
         form.on('submit(formSubmit)', function (data) {
             data = data.field;
-            liuQi.ajax("/admin/detectContract/update", data,
+            liuQi.ajax("/admin/robotContract/add", data,
                 function (data) {
                     //关闭
                     parent.layer.msg(data.msg);

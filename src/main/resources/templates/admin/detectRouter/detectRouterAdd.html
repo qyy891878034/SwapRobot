@@ -6,31 +6,18 @@
     <div class="layuimini-main">
         <form class="layui-form" action="" lay-filter="formfilter">
             <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>链ID:</label>
+                <label class="layui-form-label">链名称:</label>
                 <div class="layui-input-block">
-                    <input type="text" id="chainId" name="chainId" lay-verify="required|chainId" autocomplete="off"
-                           placeholder="链ID" class="layui-input">
+                    <select class="layui-select" lay-verify="required|chainName" id="chainName" name="chainName">
+                        <option th:each="t,tState:${ chainList}" th:value="${t}" th:text="${t}" ></option>
+                    </select>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>链名称:</label>
+                <label class="layui-form-label"><span style="color: red">*</span>路由合约:</label>
                 <div class="layui-input-block">
-                    <input type="text" id="chainName" name="chainName" lay-verify="required|chainName"
-                           autocomplete="off" placeholder="链名称" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>请求地址:</label>
-                <div class="layui-input-block">
-                    <input type="text" id="url" name="url" lay-verify="required|url"
-                           autocomplete="off" placeholder="请求地址" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label"><span style="color: red">*</span>机器人私钥:</label>
-                <div class="layui-input-block">
-                    <input type="text" id="privateKey" name="privateKey" lay-verify="required|privateKey"
-                           autocomplete="off" placeholder="机器人私钥" class="layui-input">
+                    <input type="text" id="routerContract" name="routerContract" lay-verify="required|routerContract"
+                           autocomplete="off" placeholder="路由合约" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -73,19 +60,15 @@
                     return '必填项不能为空';
                 }
             },
-            chainId: function (value) {
-            },
             chainName: function (value) {
             },
-            privateKey: function (value) {
-            },
-            url: function (value) {
+            routerContract: function (value) {
             },
         })
         //监听提交
         form.on('submit(formSubmit)', function (data) {
             data = data.field;
-            liuQi.ajax("/admin/chainRequest/add", data,
+            liuQi.ajax("/admin/detectRouter/add", data,
                 function (data) {
                     //关闭
                     parent.layer.msg(data.msg);

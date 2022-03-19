@@ -191,6 +191,8 @@ contract Apple {
     mapping (address => address) private _parentAddressMap;
     // 地址 - 累计已领取收益
     mapping (address => uint256) private _addressTakedProfitMap;
+    // 地址 - 开始计算收益的高度
+    mapping (address => uint256) private _addressStartCalProfitHeightMap;
     // 最后计算静态和动态单位算力收益的高度
     uint256 private _lastCalculateBlockHeight;
     // 锁定空间价格?
@@ -228,10 +230,7 @@ contract Apple {
     // 购买的空间信息
     struct SpaceInfo {
         uint256 time;// 购买时间
-        uint256 buyHeight;// 购买高度
         uint256 spaceAmount;// 购买空间数量
-        uint256 lastTakeHeight;// 上次领取收益高度
-        uint256 realHashRate;// 真实算力
     }
     // 销毁信息
     struct DestroyInfo {
@@ -485,7 +484,7 @@ contract Apple {
         // 当前区块高度
         uint256 currentBlockHeight = getBlockHeight();
         // 插入购买记录
-        addSpaceBuyRecord(msg.sender, currentBlockHeight, qty);
+        addSpaceBuyRecord(msg.sender, qty);
         // 计算单位收益
         calculateUnitProfit(msg.sender, qty, currentBlockHeight);
     }
@@ -624,14 +623,16 @@ contract Apple {
         }
         // 扣减算力。刷新动态算力
         takeToSubHashRate(clearStaticHashRate, msg.sender, currentBlockHeight);
+        // 刷新上次领取收益的高度
+        _addressStartCalProfitHeightMap[msg.sender] = currentBlockHeight;
     }
 
     // 添加提取记录
     function addTakeRecord(address user, uint256 takeAmount, uint256 applePrice) internal {
         _extractRecord[user].push(TakeInfo({
-            qty: takeAmount,
-            price: applePrice,
-            time: block.timestamp
+        qty: takeAmount,
+        price: applePrice,
+        time: block.timestamp
         }));
     }
 
@@ -639,33 +640,15 @@ contract Apple {
     function takeToSubHashRate(bool clearStaticHashRate, address user, uint256 currentBlockHeight) internal {
         // 地址本次扣减的静态算力
         uint256 needSubHashRate = 0;
-        uint256 all = _addressSpaceMap[user].length;
         // 静态算力清零
         if (clearStaticHashRate) {
-            for (uint256 i = 0; i < all; i++) {
-                if (_addressSpaceMap[user][i].realHashRate == 0) continue;
-                // 总扣减算力
-                needSubHashRate = needSubHashRate.add(_addressSpaceMap[user][i].realHashRate);
-                _addressSpaceMap[user][i].lastTakeHeight = currentBlockHeight;
-                _addressSpaceMap[user][i].realHashRate = 0;
-            }
+            needSubHashRate = _addressTotalStaticHashRateMap[user];
         } else {// 只降1/3算力
-            for (uint256 i = 0; i < all; i++) {
-                if (_addressSpaceMap[user][i].realHashRate == 0) continue;
-                _addressSpaceMap[user][i].lastTakeHeight = currentBlockHeight;
-                // 原来的算力
-                uint256 originHashRate = _addressSpaceMap[user][i].realHashRate;
-                // 领取一次收益，算力降1/3
-                uint256 subHashRate = originHashRate.div(3);
-                // 算力扣减
-                _addressSpaceMap[user][i].realHashRate = originHashRate.sub(subHashRate);
-                if (_addressSpaceMap[user][i].realHashRate < 1) {
-                    _addressSpaceMap[user][i].realHashRate = 0;
-                    subHashRate = originHashRate;
-                }
-                // 总扣减算力
-                needSubHashRate = needSubHashRate.add(subHashRate);
-            }
+            // 降了之后的算力
+            uint256 newHashRate = _addressTotalStaticHashRateMap[user].mul(2).div(3);
+            if (newHashRate < 1) newHashRate = 0;
+            // 总扣减算力
+            needSubHashRate = _addressTotalStaticHashRateMap[user].sub(newHashRate);
         }
         // 全网总静态算力扣减
         _netTotalStaticHashRate = _netTotalStaticHashRate.sub(needSubHashRate);
@@ -688,6 +671,14 @@ contract Apple {
 
     function getDynamicUnitProfitByHeight(uint256 blockHeight) public view returns (uint256) {
         return _dynamicUintProfitMap[blockHeight];
+    }
+
+    function getStaticHashRateByHeight(address user, uint256 blockHeight) public view returns (bool, uint256) {
+        return (_addressHeightStaticHashRateMap[user][blockHeight].record, _addressHeightStaticHashRateMap[user][blockHeight].hash);
+    }
+
+    function getDynamicHashRateByHeight(address user, uint256 blockHeight) public view returns (bool, uint256) {
+        return (_addressHeightDynamicHashRateMap[user][blockHeight].record, _addressHeightDynamicHashRateMap[user][blockHeight].hash);
     }
 
     // 领取记录条数
@@ -736,16 +727,16 @@ contract Apple {
     // 给地址的第几代添加子地址
     function addUserSpecificGenSub(address user, uint256 gen, address sub) internal {
         _subAddressMap[user][gen].push(SubInfo({
-            user: sub,
-            time: block.timestamp
+        user: sub,
+        time: block.timestamp
         }));
     }
 
     // 给地址添加下级
     function addUserSubAddress(address user, address sub) internal {
         _teamAddressArray[user].push(SubInfo({
-            user: sub,
-            time: block.timestamp
+        user: sub,
+        time: block.timestamp
         }));
     }
 
@@ -816,13 +807,10 @@ contract Apple {
     }
 
     // 添加空间购买记录
-    function addSpaceBuyRecord(address user, uint256 blockHeight, uint256 qty) internal {
+    function addSpaceBuyRecord(address user, uint256 qty) internal {
         _addressSpaceMap[user].push(SpaceInfo({
-            time: block.timestamp,
-            buyHeight: blockHeight,
-            spaceAmount: qty,
-            lastTakeHeight: blockHeight,
-            realHashRate: qty
+        time: block.timestamp,
+        spaceAmount: qty
         }));
     }
 
@@ -832,15 +820,9 @@ contract Apple {
     }
 
     // 地址计算收益时的起始高度
-    function getStartCalculateProfitBlockHeight(address user) public view returns (uint256) {
-        uint256 all = _addressSpaceMap[user].length;
-        uint256 startBlockHeight = uint256(10).power(16);
-        for (uint256 i = 0; i < all; i++) {
-            if (_addressSpaceMap[user][i].realHashRate <= 0) continue;
-            if (_addressSpaceMap[user][i].lastTakeHeight >= startBlockHeight) continue;
-            startBlockHeight = _addressSpaceMap[user][i].lastTakeHeight;
-        }
-        return startBlockHeight;
+    function getStartCalProfitBlockHeight(address user) public view returns (uint256) {
+        uint256 l = _addressStartCalProfitHeightMap[user];
+        return l < 0 ? 0 : l;
     }
 
     // 当前区块高度
@@ -873,7 +855,7 @@ contract Apple {
     // 可领取收益
     function getPendingProfit(address user, uint256 currentBlockHeight) internal view returns (uint256) {
         // 开始计算收益高度
-        uint256 startBlock = getStartCalculateProfitBlockHeight(user);
+        uint256 startBlock = getStartCalProfitBlockHeight(user);
         // 总静态算力收益
         uint256 tS = 0;
         // 总动态算力收益
@@ -906,9 +888,9 @@ contract Apple {
 
     function addDestroyRecord(address user, uint256 qty) internal {
         _destroyRecord.push(DestroyInfo({
-            user: user,
-            time: block.timestamp,
-            qty: qty
+        user: user,
+        time: block.timestamp,
+        qty: qty
         }));
     }
 

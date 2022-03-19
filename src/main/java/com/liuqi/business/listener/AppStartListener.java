@@ -31,10 +31,6 @@ public class AppStartListener implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (redisRepository.hasKey("111")) {
-            return;
-        }
-        redisRepository.set("111", 1, 30L, TimeUnit.SECONDS);
         Map<Object, Object> map = redisRepository.hmget(KeyConstant.KEY_DETECT_CHAIN_DATA);
         map.forEach((k, v) -> {
             ChainRequestDto c = (ChainRequestDto) v;

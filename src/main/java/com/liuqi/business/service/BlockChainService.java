@@ -5,10 +5,12 @@ import com.liuqi.business.dto.ContractTriggerDto;
 import com.liuqi.business.dto.QueryBalanceDto;
 import com.liuqi.business.dto.SendTransactionResultDto;
 import com.liuqi.response.ReturnResponse;
+import com.liuqi.utils.DateUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public interface BlockChainService {
@@ -49,4 +51,10 @@ public interface BlockChainService {
 
     /** 处理私钥 **/
     String processPrivateKey(String privateKey);
+
+    public static void main(String[] args) throws Exception {
+//        System.out.println(new BigInteger("28b7a9747aff0000", 16));
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println((1647672067l - 1647588538L) / 600);
+    }
 }
