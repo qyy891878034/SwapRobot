@@ -1,0 +1,33 @@
+package ${basePackage}.model;
+
+import lombok.Data;
+import java.util.Date;
+#foreach($key in $columns)
+#if($key.getEnumType()==1 && $key.getEnumName()!='')
+import ${basePackage}.enums.${key.getEnumName()};
+#end
+#end
+
+@Data
+public class ${entityName}ModelDto extends ${entityName}Model{
+
+#foreach($key in $columns)
+	#if($key.getEnumType()==1 && $key.getEnumName()!='')
+
+	private String $key.getEntityName()Str;
+
+    public String get$key.getCapEntityName()Str(){
+    	return ${key.getEnumName()}.getName(super.get$key.getCapEntityName()());
+	}
+	#end
+
+	#if($key.getEntityType()=='Date')
+		private $key.getEntityType() $key.getEntityName()Start;
+		private $key.getEntityType() $key.getEntityName()End;
+	#end
+#end
+	@JsonIgnore
+	private String sortName="create_time desc,t.id";
+	@JsonIgnore
+	private String sortType="desc";
+}

@@ -1,0 +1,20 @@
+更多验证参照项目：static/js/jquery.validation/1.14.0/validate-methods.js
+required:true	必须输入的字段。
+remote:"check.php"	使用 ajax 方法调用 check.php 验证输入值。
+isMobile:true 必须输入正确格式的手机。
+email:true	必须输入正确格式的电子邮件。
+url:true	必须输入正确格式的网址。
+date:true	必须输入正确格式的日期。日期校验 ie6 出错，慎用。
+dateISO:true	必须输入正确格式的日期（ISO），例如：2009-06-23，1998/01/22。只验证格式，不验证有效性。
+number:true	必须输入合法的数字（负数，小数）。
+digits:true	必须输入整数。
+creditcard:	必须输入合法的信用卡号。
+equalTo:"#field"	输入值必须和 #field 相同。
+notEqualTo:"#field" 输入值必须和 #field 不相同
+accept:	输入拥有合法后缀名的字符串（上传文件的后缀）。
+maxlength:5	输入长度最多是 5 的字符串（汉字算一个字符）。
+minlength:10	输入长度最小是 10 的字符串（汉字算一个字符）。
+rangelength:[5,10]	输入长度必须介于 5 和 10 之间的字符串（汉字算一个字符）。
+range:[5,10]	输入值必须介于 5 和 10 之间。
+max:5	输入值不能大于 5。
+min:10	输入值不能小于 10。

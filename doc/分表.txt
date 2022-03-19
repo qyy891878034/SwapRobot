@@ -1,0 +1,31 @@
+//强制使用主库
+HintManager hintManager = HintManager.getInstance();
+hintManager.setMasterRouteOnly();
+
+
+ShardingDataSourceConfig配置
+
+
+    @Bean("dataSource")
+    public DataSource dataSource() throws SQLException {
+        shardingMastSlaveConfig.getDataSources().forEach((k, v) -> configDataSource(v));
+        Map<String, DataSource> dataSourceMap = Maps.newHashMap();
+        dataSourceMap.putAll(shardingMastSlaveConfig.getDataSources());
+        //DataSource dataSource = MasterSlaveDataSourceFactory.createDataSource(dataSourceMap, shardingMastSlaveConfig.getMasterSlave(), Maps.newHashMap());
+
+
+        ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
+        shardingRuleConfig.getTableRuleConfigs().add(getOrderTableRuleConfiguration());
+        shardingRuleConfig.getBindingTableGroups().add("t_user_wallet_log");
+        shardingRuleConfig.setDefaultTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("user_id", ModuloShardingTableAlgorithm.class.getName()));
+        shardingRuleConfig.setMasterSlaveRuleConfigs(getMasterSlaveRuleConfigurations());
+        log.info("masterSlaveDataSource config complete");
+        return ShardingDataSourceFactory.createDataSource(dataSourceMap, shardingRuleConfig, new HashMap<String, Object>(), new Properties());
+    }
+    private TableRuleConfiguration getOrderTableRuleConfiguration() {
+        TableRuleConfiguration orderTableRuleConfig = new TableRuleConfiguration();
+        orderTableRuleConfig.setLogicTable("t_user_wallet_log");
+        orderTableRuleConfig.setActualDataNodes("ds_0.t_user_wallet_log_${[0,1,2,3]}");
+        orderTableRuleConfig.setKeyGeneratorColumnName("id");
+        return orderTableRuleConfig;
+    }

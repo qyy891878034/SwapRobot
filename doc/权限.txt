@@ -1,0 +1,6 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<shiro:hasPermission name="adminuser:add">
+      <a href="javascript:" onclick="add('添加','/admin/userAdmin/toAdd','','410')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加</a>
+</shiro:hasPermission>

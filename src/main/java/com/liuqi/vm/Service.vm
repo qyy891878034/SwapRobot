@@ -1,0 +1,11 @@
+package ${basePackage}.service;
+
+import com.liuqi.base.BaseService;
+import ${basePackage}.model.${entityName}Model;
+import ${basePackage}.model.${entityName}ModelDto;
+
+public interface ${entityName}Service extends BaseService<${entityName}Model,${entityName}ModelDto>{
+
+
+
+}

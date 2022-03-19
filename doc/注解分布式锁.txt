@@ -1,0 +1,42 @@
+service调用同一个的方式  事物不生效
+启动类加上 @EnableAspectJAutoProxy(exposeProxy = true)方式暴漏代理对象，然后在service中通过代理对象AopContext.currentProxy()去调用方法。
+
+注解
+@CurAdminId 在后台控制层中加入，获取当前管理员id
+@CurSysId   在子后台控制层中加入，获取当前子后台用户id
+@CurUserId  在前台控制层中加入，获取当前用户id
+
+例子：AdminExtractController
+    @RequestMapping(value = "/autoExtract")
+    @ResponseBody
+    public ReturnResponse autoExtract(@CurAdminId Long adminId,@RequestParam("id") Long id, HttpServletRequest request)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+1方法添加注解，lockPrefix的值为锁的key前缀
+ @RedisLock(lockPrefix = "XXXX")
+ 2如果锁需要根据业务 则方法添加参数注解@LockValue
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+ 例子1：
+ 按照key="base:info"锁
+
+  @RedisLock(lockPrefix = "base:info")
+  public void XXX(String a,String b){
+  }
+-----------------------------------------------------------------------
+  例子2：
+
+  按照key="base:info:"+a的值锁
+    @RedisLock(lockPrefix = "base:info")
+    public void XXX(@LockValue String a,String b){
+    }
+-----------------------------------------------------------------------
+  例子3：
+
+  按照key="base:info:"+userid+b的值锁
+    @RedisLock(lockPrefix = "base:info")
+    public void XXX(@CurUserId @LockValue Long userId,@LockValue String a,String b){
+    }

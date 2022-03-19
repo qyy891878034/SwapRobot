@@ -1,0 +1,78 @@
+layer.confirm("是否发送接口处理",function (obj) {
+
+})
+
+按钮：
+原始无色	class="layui-btn layui-btn-primary"
+默认绿色	class="layui-btn"
+百搭蓝色	class="layui-btn layui-btn-normal"
+暖色黄色	class="layui-btn layui-btn-warm"
+警告红色	class="layui-btn layui-btn-danger"
+禁用灰色	class="layui-btn layui-btn-disabled"
+
+
+表单行按钮判断  使用laytpl语法： https://www.layui.com/doc/modules/laytpl.html
+{{# if(){ }}
+    <a class="layui-btn layui-btn-xs  layui-btn-warm data-count-edit" lay-event="event1">按钮1</a>
+{{# else if(){ }}
+    <a class="layui-btn layui-btn-xs  layui-btn-warm data-count-edit" lay-event="event2">按钮2</a>
+{{# else{ }}
+     <a class="layui-btn layui-btn-xs  layui-btn-warm data-count-edit" lay-event="event3">按钮3</a>
+{{# } }}
+
+
+1.打开一个弹出页面
+openDialog(url,params,title,w,h)
+参数：url,请求参数，标题，宽度%，高度%
+例子：liuQi.openDialog('/admin/extract/todo',{"id":data.id},"手动审核",'','90');
+
+
+2.ajax访问请求后刷新当前表单
+ajaxRefreshTable(url,params,refresh,successCallBack,failCallback)
+参数：url,请求参数，刷新表单id，成功后的操作，失败后的操作
+例子：liuQi.ajaxRefreshTable('/admin/extract/autoExtract',{"id":data.id},"");
+
+3.操作页面使用请求，请求后刷新父类的datatable
+ajax(url,params,successCallBack,failCallback)
+参数：url,请求参数，成功后的操作，失败后的操作
+例子：liuQi.ajax("/admin/extract/refuse", data,
+    function (data) {
+        //关闭
+        parent.layer.msg(data.msg);
+        parent.layui.table.reload('currentTableId');
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    }
+);
+
+4.上传的ajax
+ajaxUpload(url,params,refresh,successCallBack,failCallback)
+参数：url,请求参数，刷新表单id，成功后的操作，失败后的操作
+例子：
+form.on('submit(formSubmit)', function (data) {
+    var formData = new FormData($('#uploadForm')[0]);
+    liuQi.ajaxUpload("/admin/slide/addP",formData,
+            function (data) {
+                //关闭
+                parent.layer.msg(data.msg);
+                parent.layui.table.reload('currentTableId');
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+            }
+    );
+    return false;
+});
+
+
+5.导出ajax
+export:(url,params)
+参数：url,请求参数
+例子：
+form.on('submit(data-export-btn)', function (data) {
+    var params = data.field;
+    liuQi.export('/admin/extract/exportExc',params);
+    return false;
+});
+
+
+

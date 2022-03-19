@@ -1,0 +1,17 @@
+获取数字格式化 th:value="${#numbers.formatDecimal(m.quantity,1,8)}"
+获取日期格式化 th:value="${#dates.format(m.startTime,'yyyy-MM-dd HH:mm:ss')}"
+
+上传
+form.on('submit(formSubmit)', function (data) {
+    var formData = new FormData($('#uploadForm')[0]);
+    liuQi.ajaxUpload("/admin/app/updateApp",formData,'',
+            function (data) {
+                //关闭
+                parent.layer.msg(data.msg);
+                parent.layui.table.reload('currentTableId');
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+            }
+    );
+    return false;
+});

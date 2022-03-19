@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${basePackage}.mapper.${entityName}Mapper">
+
+	<!-- 常用查询 -->
+	<sql id="allColumn">
+		<trim suffixOverrides=",">
+			#foreach($key in $columns)t.$key.getName(),#end
+
+		</trim>
+	</sql>
+
+    <!-- 数据库和实体映射  对应数据库实体-->
+	<resultMap type="${entityName_uncapitalize}Model" id="${entityName_uncapitalize}">
+#foreach($key in $columns)
+		<result property="$key.getEntityName()" column="$key.getName()"/>
+#end
+	</resultMap>
+
+	<!-- dto映射  添加的字段放在这块-->
+    <resultMap type="${entityName_uncapitalize}ModelDto" extends="${entityName_uncapitalize}" id="${entityName_uncapitalize}Dto">
+    </resultMap>
+
+	<!-- 新增 -->
+	<insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true" parameterType="${entityName_uncapitalize}Model">
+		insert into ${tableName}(
+		<trim  suffixOverrides=",">
+#foreach($key in $columns)
+		#if($key.getName() !='' && $key.getName() !='id')<if test="$key.getEntityName() != null">`$key.getName()`,</if>
+		#end
+#end
+
+		</trim>
+		) values(
+		<trim suffixOverrides=",">
+#foreach($key in $columns)
+		#if($key.getName() !='' && $key.getName() !='id')<if test="$key.getEntityName() != null">#{$key.getEntityName()},</if>
+		#end
+#end
+
+		</trim>
+		)
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="${entityName_uncapitalize}Model">
+		update  ${tableName}
+		<set>
+#foreach($key in $columns)
+#if($key.getName() !='' && $key.getName() !='id')
+            <if test="$key.getEntityName() != null">
+                    `$key.getName()` = #{$key.getEntityName()},
+            </if>
+#end
+#end		
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 查询 -->
+	<select id="getById" resultMap="${entityName_uncapitalize}Dto">
+		select <include refid="allColumn"></include> 
+		from  ${tableName} t 
+		where t.id = #{id}
+	</select>
+	<!-- 查询 -->
+	<select id="getByIds" resultMap="${entityName_uncapitalize}Dto">
+		select <include refid="allColumn"></include> 
+		from  ${tableName} t 
+		where  t.id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+
+
+    <!-- 优化查询count -->
+    <select id="queryList_COUNT" parameterType="${entityName_uncapitalize}ModelDto" resultType="Long">
+        select count(t.id)
+        <include refid="queryList_base"></include>
+    </select>
+
+	<!-- 查询列表 -->
+	<select id="queryList" parameterType="${entityName_uncapitalize}ModelDto" resultMap="${entityName_uncapitalize}Dto">
+		select <include refid="allColumn"></include>
+        <include refid="queryList_base"></include>
+		<!-- 排序 -->
+		<if test="sortName != null and sortName!=''">
+			order by t.${sortName}
+            <if test="sortType != null and sortType!=''">
+                 ${sortType}
+            </if>
+		</if>
+	</select>
+
+    <!-- base基础查询 -->
+	<sql id="queryList_base">
+        from  ${tableName} t
+        <trim prefix="where" prefixOverrides="AND|OR">
+			#foreach($key in $columns)<if test="$key.getEntityName() != null #if($key.isStr())and  $key.getEntityName() != '' #end  #if($key.isNum()) and $key.getEntityName() &gt; -2 #end">
+				AND t.$key.getName() = #{$key.getEntityName()}
+            </if>
+	#if($key.getFrontShow()=='1' && $key.getFrontQueryType()=='4')
+			<if test="$key.getEntityName()Start != null ">
+				AND t.$key.getName() >= #{$key.getEntityName()Start}
+			</if>
+			<if test="$key.getEntityName()End != null ">
+				<![CDATA[
+				AND t.$key.getName() <= #{$key.getEntityName()End}
+				]]>
+			</if>
+			#end
+
+			#end
+
+            <if test="startCreateTime!=null">
+                and t.create_time>#{startCreateTime}
+            </if>
+            <if test="endCreateTime!=null">
+                <![CDATA[and t.create_time<=#{endCreateTime}]]>
+            </if>
+        </trim>
+	</sql>
+
+</mapper>

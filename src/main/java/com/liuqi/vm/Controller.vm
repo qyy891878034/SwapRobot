@@ -1,0 +1,100 @@
+package ${basePackage}.controller.${urlPrefix};
+
+
+import com.liuqi.base.BaseAdminController;
+import com.liuqi.base.BaseService;
+import ${basePackage}.model.${entityName}Model;
+import ${basePackage}.model.${entityName}ModelDto;
+import ${basePackage}.service.${entityName}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import com.liuqi.business.dto.SelectDto;
+#foreach($key in $columns)#if($key.getEnumType()==1 && $key.getEnumName()!='')import ${basePackage}.enums.${key.getEnumName()};
+#end
+#end
+
+@Controller
+@RequestMapping("/${urlPrefix}/${entityName_uncapitalize}")
+public class ${cap_urlPrefix}${entityName}Controller extends BaseAdminController<${entityName}Model,${entityName}ModelDto> {
+
+    @Autowired
+    private ${entityName}Service ${entityName_uncapitalize}Service;
+    //jsp基础路径
+    private final static String JSP_BASE_PTH="${urlPrefix}";
+    //模块
+    private final static String BASE_MODUEL="${entityName_uncapitalize}";
+    //默认为""表示可以使用add和update。  重写add或update时，原有方法禁止使用 NOT_OPERATE="add,update"
+    private final static String NOT_OPERATE="";
+    @Override
+    public BaseService getBaseService() {
+    	return this.${entityName_uncapitalize}Service;
+    }
+
+    @Override
+    public String getJspBasePath() {
+        return JSP_BASE_PTH;
+    }
+    @Override
+    public String getBaseModuel() {
+        return BASE_MODUEL;
+    }
+    @Override
+    public String getNotOperate() { return NOT_OPERATE;}
+    @Override
+    public String getDefaultExportName() { return DEFAULT_EXPORTNAME;}
+    /*******待修改  排序  导出**********************************************************************************************************/
+    //默认导出名称
+    private final static String DEFAULT_EXPORTNAME="${moduleName}";
+    @Override
+    public String[] getDefaultExportHeaders(){
+        String[] headers = {#foreach($key in $columns)"$key.getComment()"#if($foreach.hasNext),#end#end};
+        return headers;
+    }
+    @Override
+    public String[] getDefaultExportColumns(){
+        String[] columns = {#foreach($key in $columns)"$key.getEntityName()"#if($foreach.hasNext),#end#end};
+        return columns;
+    }
+    /*******自己代码**********************************************************************************************************/
+
+
+    @Override
+    protected void toListHandle(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+        super.toListHandle(modelMap, request, response);
+        this.getEnumList(modelMap);
+    }
+
+    @Override
+    protected void toAddHandle(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+        super.toAddHandle(modelMap, request, response);
+        this.getEnumList(modelMap);
+    }
+
+    @Override
+    protected void toUpdateHandle(${entityName}ModelDto t, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+        super.toUpdateHandle(t, modelMap, request, response);
+        this.getEnumList(modelMap);
+    }
+
+    @Override
+    protected void toViewHandle(${entityName}ModelDto t,ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+        super.toViewHandle(t,modelMap, request, response);
+        this.getEnumList(modelMap);
+    }
+
+    private void getEnumList(ModelMap modelMap){
+#foreach($key in $columns)
+#if($key.getEnumType()==1 && $key.getEnumName()!='')
+        List<SelectDto> $key.getEntityName()List= ${key.getEnumName()}.getList();
+        modelMap.put("$key.getEntityName()List",$key.getEntityName()List);
+
+#end
+#end
+    }
+}

@@ -1,0 +1,13 @@
+1默认不添加操作日志
+
+2base的insert和updatet添加日志只需重新在controller重写
+protected boolean addLogger() {
+        return true;
+}
+protected boolean updateLogger() {
+        return true;
+}
+
+3新增自定义方法添加操作日志  参照AdminCurrencyController类
+在调用service前时添加操作信息
+BaseAdminController.opeLogger.set(getLogger(adminId, LoggerModelDto.TYPE_UPDATE,"修改", JSONObject.toJSONString(currency)+"修改后："+JSONObject.toJSONString(old)));

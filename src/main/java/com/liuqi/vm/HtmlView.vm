@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:include="admin/head :: head" th:with="title={moduleName}查看">
+<body>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form" action="" lay-filter="formfilter">
+#foreach($key in $columns)#if($key.getName()!='id')
+                <div class="layui-form-item">
+                    <label class="layui-form-label">$key.getComment():</label>
+                    <div class="layui-input-block">
+#if($key.getAddUpdateType()=='2')
+                            <input class="layui-input" th:value="${ m.$key.getEntityName()Str}" disabled="disabled">
+#elseif($key.getAddUpdateType()=='3')
+                            <input class="layui-input" th:value="${ m.$key.getEntityName()Str}" disabled="disabled">
+#elseif($key.getAddUpdateType()=='4')
+                            <input class="layui-input" th:value="${#dates.format(m.$key.getEntityName(),'yyyy-MM-dd HH:mm:ss')}" disabled="disabled">
+#else
+                            <input class="layui-input" th:value="${ m.$key.getEntityName()}" disabled="disabled">
+#end
+                    </div>
+                </div>
+#end
+#end
+        </form>
+    </div>
+</div>
+</body>
+</html>

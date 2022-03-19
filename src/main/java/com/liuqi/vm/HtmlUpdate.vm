@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:include="admin/head :: head" th:with="title=${moduleName}编辑">
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form" action="" lay-filter="formfilter">
+#foreach($key in $columns)#if($key.getName()!='id')
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span style="color: red">*</span>$key.getComment():</label>
+                    <div class="layui-input-block">
+#if($key.getAddUpdateType()=='2')
+                            <input type="radio" th:each="t,tState:${ $key.getEntityName()List}" th:value="${t.key}" lay-verify="otherReq" name="$key.getEntityName()" th:title="${t.name}" th:checked="${ t.key == m.$key.getEntityName()}">
+#elseif($key.getAddUpdateType()=='3')
+                            <select  lay-verify="required|$key.getEntityName()" id="$key.getEntityName()" name="$key.getEntityName()" lay-search="">
+                                <option value="">请选择</option>
+                                <option th:each="t,tState:${ $key.getEntityName()List}" th:value="${t.key}" th:text="${t.name}" th:selected="${ t.key == m.$key.getEntityName()}"></option>
+                            </select>
+#elseif($key.getAddUpdateType()=='4')
+                            <input type="text" id="$key.getEntityName()" name="$key.getEntityName()" lay-verify="required|$key.getEntityName()" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input" th:value="${#dates.format(m.$key.getEntityName(),'yyyy-MM-dd HH:mm:ss')}">
+#elseif($key.getAddUpdateType()=='5')
+                            <input type="checkbox" th:checked="${ m.$key.getEntityName()==1}" lay-filter="$key.getEntityName()Show" lay-skin="switch" lay-text="ON|OFF">
+                            <input type="hidden" id="$key.getEntityName()" name="$key.getEntityName()" th:value="${ m.$key.getEntityName()}">
+#elseif($key.getAddUpdateType()=='6')
+                            <textarea id="$key.getEntityName()" name="$key.getEntityName()"  lay-verify="required|$key.getEntityName()" autocomplete="off" placeholder="$key.getComment()" class="layui-textarea" th:text="${ m.$key.getEntityName()}"></textarea>
+#else
+                            <input type="text" id="$key.getEntityName()" name="$key.getEntityName()" lay-verify="required|$key.getEntityName()" autocomplete="off"  class="layui-input" th:value="${ m.$key.getEntityName()}">
+#end
+                    </div>
+                </div>
+#end
+#end
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="hidden" name="id" th:value="${ m.id}">
+                    <button class="layui-btn" lay-submit="" lay-filter="formSubmit">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    layui.use(['laydate', 'layer', 'jquery','liuQi'], function () {
+            var form = layui.form,
+                liuQi = layui.liuQi,
+                laydate = layui.laydate;
+
+            //日期
+#foreach($key in $columns)#if($key.getAddUpdateType()=='4')
+            laydate.render({
+                elem: '#$key.getEntityName()',
+                type:'datetime'
+            });
+#elseif($key.getAddUpdateType()=='5')
+            form.on('switch($key.getEntityName()Show)', function(data){
+                $("#$key.getEntityName()").val(this.checked?1:0);
+            });
+#end
+#end
+            form.render();
+
+            //自定义验证规则
+            form.verify({
+                //radio验证
+                otherReq: function(value,item){
+                    var $ = layui.$;
+                    var verifyName=$(item).attr('name')
+                            , verifyType=$(item).attr('type')
+                            ,formElem=$(item).parents('.layui-form')//获取当前所在的form元素，如果存在的话
+                            ,verifyElem=formElem.find('input[name='+verifyName+']')//获取需要校验的元素
+                            ,isTrue= verifyElem.is(':checked')//是否命中校验
+                            ,focusElem = verifyElem.next().find('i.layui-icon');//焦点元素
+                    if(!isTrue || !value){
+                        //定位焦点
+                        focusElem.css(verifyType=='radio'?{"color":"#FF5722"}:{"border-color":"#FF5722"});
+                        //对非输入框设置焦点
+                        focusElem.first().attr("tabIndex","1").css("outline","0").blur(function() {
+                            focusElem.css(verifyType=='radio'?{"color":""}:{"border-color":""});
+                        }).focus();
+                        return '必填项不能为空';
+                    }
+                },
+#foreach($key in $columns)
+                $key.getEntityName(): function (value) {
+                },
+#end
+            })
+        //监听提交
+            form.on('submit(formSubmit)', function (data) {
+                data=data.field;
+                liuQi.ajax("/${urlPrefix}/${entityName_uncapitalize}/update",data,
+                        function (data) {
+                            //关闭
+                            parent.layer.msg(data.msg);
+                            parent.layui.table.reload('currentTableId');
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        }
+                );
+                return false;
+            });
+        });
+</script>
+
+</body>
+</html>

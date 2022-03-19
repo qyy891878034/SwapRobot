@@ -1,0 +1,11 @@
+package ${basePackage}.mapper;
+
+import com.liuqi.base.BaseMapper;
+import ${basePackage}.model.${entityName}Model;
+import ${basePackage}.model.${entityName}ModelDto;
+
+
+public interface ${entityName}Mapper extends BaseMapper<${entityName}Model,${entityName}ModelDto>{
+
+
+}

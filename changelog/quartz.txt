@@ -1,0 +1,8 @@
+1 充值
+com.liuqi.jobtask.RechargeJob
+RechargeJob
+8 2/2 * * * ?
+
+
+
+

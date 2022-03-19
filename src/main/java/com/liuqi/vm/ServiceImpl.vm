@@ -1,0 +1,30 @@
+package ${basePackage}.service.impl;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.liuqi.base.BaseMapper;
+import com.liuqi.base.BaseServiceImpl;
+import ${basePackage}.model.${entityName}Model;
+import ${basePackage}.model.${entityName}ModelDto;
+
+
+import ${basePackage}.service.${entityName}Service;
+import ${basePackage}.mapper.${entityName}Mapper;
+
+@Service
+@Transactional(readOnly = true)
+public class ${entityName}ServiceImpl extends BaseServiceImpl<${entityName}Model,${entityName}ModelDto> implements ${entityName}Service{
+
+	@Autowired
+	private ${entityName}Mapper ${entityName_uncapitalize}Mapper;
+	
+
+	@Override
+	public BaseMapper<${entityName}Model,${entityName}ModelDto> getBaseMapper() {
+		return this.${entityName_uncapitalize}Mapper;
+	}
+
+}

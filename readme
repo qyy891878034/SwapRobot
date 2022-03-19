@@ -1,0 +1,4 @@
+充提1号项目：所有私钥在此项目保存，只提供私网供充提2号项目访问
+t_passphrase中的pwd字段对应每个项目的COMMON1+COMMON2加密后的密码
+助记词，私钥等的加密密钥使用COMMON1+pwd解密后的密码
+coinbase2与1交互使用COMMON1+COMMON2加密
