@@ -20,6 +20,10 @@ public class MethodConstant {
     public static final String PANCAKE_SWAP_BUY2 = "38ed1739";
 
     public static void main(String[] args) {
+
+
+
+
         System.out.println(new BigInteger("13a198cf010af8710", 16));
     }
 }

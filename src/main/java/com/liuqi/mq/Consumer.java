@@ -2,6 +2,7 @@ package com.liuqi.mq;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.liuqi.business.constant.KeyConstant;
 import com.liuqi.business.constant.MqConstant;
 import com.liuqi.business.context.BlockChainContext;
 import com.liuqi.business.dto.ChainRequestDto;
@@ -11,12 +12,15 @@ import com.liuqi.business.service.ClampRecordService;
 import com.liuqi.business.service.DetectService;
 import com.liuqi.mq.dto.EmailDto;
 import com.liuqi.mq.dto.SmsDto;
+import com.liuqi.redis.RedisRepository;
 import com.liuqi.third.email.AliEmailSender;
 import com.liuqi.third.sms.SmsSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 消费者处理消息
@@ -31,6 +35,8 @@ public class Consumer {
     private SmsSender smsSender;
     @Autowired
     private ClampRecordService clampRecordService;
+    @Autowired
+    private RedisRepository redisRepository;
     @Autowired
     private DetectService detectService;
 
@@ -66,6 +72,7 @@ public class Consumer {
     @JmsListener(destination = MqConstant.MQ_RECONNECT_CHAIN_WS)
     public void receiveReconnectChainWs(String text) {
         ChainRequestDto c = JSONObject.parseObject(text, ChainRequestDto.class);
+        redisRepository.del(KeyConstant.KEY_START_APP);
         detectService.startDetect(c);
     }
 

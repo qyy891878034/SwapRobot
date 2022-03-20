@@ -53,6 +53,7 @@ public class BlockChainServiceImpl implements BlockChainService {
         log.info("拦截时间" + System.currentTimeMillis());
         String triggerAddress = Credentials.create(privateKey).getAddress();
         Long nonce = redisRepository.hincreone(KeyConstant.KEY_DETECT_ADDRESS_NONCE, triggerAddress);
+//        Long nonce = 4L;
         String data = processRequest(chainId, privateKey,
                 contractAddress, nonce, gasPrice, gasLimit, method, params, tHash);
         return data;
@@ -362,6 +363,13 @@ public class BlockChainServiceImpl implements BlockChainService {
     }
 
     public static void main(String[] args) {
+        String rr = HttpUtil.createPost("https://bsc.getblock.io/mainnet/?api_key=44fae5f3-2303-41c8-a0a4-865c8ae5e7c0").body(new BlockChainServiceImpl().getTriggerSmartContractData(56L, BigInteger.valueOf(25000), BigInteger.TEN.pow(9).multiply(BigInteger.valueOf(5)),
+                "1b4f6153d1b2323964885bd7f11df1f96c182650acf2c5940a91f999354da735", "0x55d398326f99059ff775485246999027b3197955",
+                "095ea7b3", "00000000000000000000000010ed43c718714eb63d5aa57b78b54704e256024e00000000000000000000000000000000000000000000001b1ae4d6e2ef500000", "sdfsdf")).timeout(3000).execute().body();
+        System.out.println(rr);
+    }
+
+    public static void maisdfsfn(String[] args) {
         String address = "0x16d211f3be093d4b484054364471d68dd02a6d82";
         String contractAddress = "0x6d5b44925e1118b6caba47148ca78a8f8b69bbb2";
         String param1 = "000000000000000000000000000000000000000000000000000000000000008A";

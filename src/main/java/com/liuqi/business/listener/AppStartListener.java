@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.web3j.crypto.Credentials;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -39,8 +40,7 @@ public class AppStartListener implements ApplicationRunner {
     }
 
     public static void main(String[] args) {
-        System.out.println(new BigDecimal(new BigInteger("7ccf433be4a64ba9f", 16))
-                .divide(BigDecimal.TEN.pow(18)));
+        System.out.println(Credentials.create("4a9fe5b7132921f3918f426c58d2bae3b9f06a467f06de6225fc6ef2c0a1d050").getAddress());
     }
 
 

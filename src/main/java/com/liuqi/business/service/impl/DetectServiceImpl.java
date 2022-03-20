@@ -63,19 +63,19 @@ public class DetectServiceImpl implements DetectService {
             return;
         }
         redisRepository.set(KeyConstant.KEY_START_APP, 1, 30L, TimeUnit.SECONDS);
-        log.info("启动链监测" + dto.getChainName());
+        log.info("启动链监测" + dto.getChainName() + "-" + dto.getUrl());
         OkHttpClient mClient = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)//设置读取超时时间
                 .writeTimeout(3, TimeUnit.SECONDS)//设置写的超时时间
                 .connectTimeout(3, TimeUnit.SECONDS)//设置连接超时时间
                 .build();
         //构建一个连接请求对象
-        Request request = new Request.Builder().get().url("wss://" + dto.getUrl()).build();
+        Request request = new Request.Builder().url("wss://" + dto.getUrl()).build();
         //开始连接
         mClient.newWebSocket(request, new WebSocketListener() {
             @Override
             public void onOpen(WebSocket webSocket, Response response) {
-                log.info("onOpen" + dto.getChainName());
+                log.info("onOpen" + dto.getChainName() + "-" + dto.getUrl());
                 addWs(dto.getChainName(), webSocket);
                 subscribePending(webSocket);
             }
@@ -111,11 +111,11 @@ public class DetectServiceImpl implements DetectService {
     }
 
     private void removeWs(ChainRequestDto dto, int code) {
-        WebSocket webSocket = chainWsMap.remove(dto.getChainName());
-        if (code == CODE_ERROR) {
-            if (webSocket == null) return;
-            webSocket.close(CODE_ERROR, "fail");
-        }
+//        WebSocket webSocket = chainWsMap.remove(dto.getChainName());
+//        if (code == CODE_ERROR) {
+//            if (webSocket == null) return;
+//            webSocket.close(CODE_ERROR, "fail");
+//        }
         // TODO 丢消息队列出去，重连WS
         commonProducer.sendReconnectChainWs(dto);
     }
@@ -185,11 +185,14 @@ public class DetectServiceImpl implements DetectService {
         // 非本系统监测的路由合约，跳过
         if (!redisRepository.hHasKey(KeyConstant.KEY_DETECT_CONTRACT_ADDRESS + dto.getChainName(), contractAddress)) return;
         String input = result.getString("input");
+        if (input.equalsIgnoreCase("0x")) return;
         ContractTriggerDto contractTriggerDto = blockChainService.parseInput(input);
         String receiveAddress = BlockChainUtil.getAddressFromParam(contractTriggerDto.getParams()[0]).toLowerCase();
 //        log.info("合约swap信息={}", result.toJSONString());
         // 非买卖信息
         if (!StringUtils.equalsAnyIgnoreCase(contractTriggerDto.getMethod(), MethodConstant.PANCAKE_SWAP_BUY1, MethodConstant.PANCAKE_SWAP_BUY2)) return;
+
+
 
         Integer pathOffset = Integer.valueOf(contractTriggerDto.getParams()[2], 16) / 32;// path[] offset
         Integer pathLength = Integer.valueOf(contractTriggerDto.getParams()[pathOffset], 16);// path[] length
@@ -199,6 +202,9 @@ public class DetectServiceImpl implements DetectService {
         // 不是此路由监测的买入币种合约 + 看此买入币的支持的稳定币合约
         if (StringUtils.isEmpty(stableCoins) || !stableCoins.contains(payCoinContractAddress)) return;
 
+        if (redisRepository.hasKey("22222")) return;
+        redisRepository.set("22222", 1);
+
         BigInteger gasLimit = new BigInteger(result.getString("gas").substring(2), 16);
         BigInteger gasPrice = new BigInteger(result.getString("gasPrice").substring(2), 16);
         BigInteger i1 = new BigInteger(contractTriggerDto.getParams()[0], 16);// amountOut - 买入的币的精准数量
@@ -206,14 +212,35 @@ public class DetectServiceImpl implements DetectService {
         log.info("交易哈希={},以{}购买{}", hash, payCoinContractAddress, buyCoinContractAddress);
         // USDT或者BUSD买
         log.info("gasLimit={},gasPrice={},", gasLimit, gasPrice);
+        String buyExtractToken = "";
+        String payMaxToken = "";
+        String sellMinToken = "";
         if (StringUtils.equalsIgnoreCase(contractTriggerDto.getMethod(), MethodConstant.PANCAKE_SWAP_BUY1)) {
-            log.info("最多只支付{}", i2);
-            contractTriggerDto.getParams()[0] = BlockChainUtil.addZero(i1.divide(BigInteger.TEN).toString(16), 64);
-            contractTriggerDto.getParams()[1] = BlockChainUtil.addZero(i2.divide(BigInteger.TEN).toString(16), 64);
+            log.info("最多只支付{}", i2);// i1为买入的精确数量，i2为支付的最多的数量
+            buyExtractToken = BlockChainUtil.addZero(i1.divide(BigInteger.TEN).toString(16), 64);
+            payMaxToken = BlockChainUtil.addZero(i2.divide(BigInteger.TEN).toString(16), 64);
+            sellMinToken = BlockChainUtil.addZero(i2.divide(BigInteger.TEN).multiply(BigInteger.valueOf(3)).divide(BigInteger.valueOf(4)).toString(16), 64);
         } else {
-            log.info("支付固定数量{}", i1);
-            contractTriggerDto.getParams()[0] = BlockChainUtil.addZero(i2.divide(BigInteger.TEN).toString(16), 64);
-            contractTriggerDto.getParams()[1] = BlockChainUtil.addZero(i2.divide(BigInteger.TEN).toString(16), 64);
+            log.info("支付固定数量{}", i1);// i1为支付的精确数量，i2为买入的最低数量
+            buyExtractToken = BlockChainUtil.addZero(i2.divide(BigInteger.TEN).toString(16), 64);
+            payMaxToken = BlockChainUtil.addZero(i1.divide(BigInteger.TEN).toString(16), 64);
+            sellMinToken = BlockChainUtil.addZero(i1.divide(BigInteger.TEN).multiply(BigInteger.valueOf(3)).divide(BigInteger.valueOf(4)).toString(16), 64);
+        }
+
+        StringBuilder commonStringBuilder = new StringBuilder();
+        for (int i = 2; i <= pathOffset; i++) {
+            if (i == 3) {
+                commonStringBuilder.append(BlockChainUtil.addZero(BlockChainUtil.getParamFromAddress(Credentials.create(dto.getPrivateKey()).getAddress()), 64));
+            } else {
+                commonStringBuilder.append(contractTriggerDto.getParams()[i]);
+            }
+        }
+
+        StringBuilder buyStringBuilder = new StringBuilder();
+        StringBuilder sellStringBuilder = new StringBuilder();
+        for (int i = pathOffset + pathLength; i > pathOffset; i--) {
+            buyStringBuilder.append(contractTriggerDto.getParams()[pathOffset + pathOffset + pathLength - i + 1]);
+            sellStringBuilder.append(contractTriggerDto.getParams()[i]);
         }
 
 //        String params1 = contractTriggerDto.getParams()[0];
@@ -224,10 +251,15 @@ public class DetectServiceImpl implements DetectService {
 //                .method(MethodConstant.TRANSFER).params(params1 + params2).build();
 //        String dataHash = MD5Util.MD5Encode(JSONObject.toJSONString(t));
 //        waitTransferMap.put(dataHash, t);
-        // 查下收款方有没有上级
-        String s = blockChainService.getTriggerSmartContractData(dto.getChainId(), gasLimit, gasPrice.multiply(BigInteger.valueOf(2)), dto.getPrivateKey(), contractAddress,
-                MethodConstant.PANCAKE_SWAP_BUY1, contractTriggerDto.getParams()[0], hash);
-//        webSocket.send(s);
+        // gasprice*2发布买单
+        String buy = blockChainService.getTriggerSmartContractData(dto.getChainId(), gasLimit, gasPrice.multiply(BigInteger.valueOf(3)), dto.getPrivateKey(), contractAddress,
+                MethodConstant.PANCAKE_SWAP_BUY1, buyExtractToken + payMaxToken + commonStringBuilder + buyStringBuilder, hash);
+        String sell = blockChainService.getTriggerSmartContractData(dto.getChainId(), gasLimit.multiply(BigInteger.valueOf(2)), gasPrice.multiply(BigInteger.valueOf(80)).divide(BigInteger.valueOf(100)), dto.getPrivateKey(), contractAddress,
+                MethodConstant.PANCAKE_SWAP_BUY2, buyExtractToken + sellMinToken + commonStringBuilder + sellStringBuilder, hash);
+        log.info("买单" + (buyExtractToken + payMaxToken + commonStringBuilder + buyStringBuilder));
+        log.info("卖单" + (buyExtractToken + sellMinToken + commonStringBuilder + sellStringBuilder));
+        webSocket.send(buy);
+        webSocket.send(sell);
 //        ClampRecordModelDto c = new ClampRecordModelDto();
 //        c.setChainName(dto.getChainName());
 //        c.setAddress(receiveAddress);
@@ -282,6 +314,7 @@ public class DetectServiceImpl implements DetectService {
     }
 
     private void processClamp(String tHash, JSONObject jsonObject) {
+        log.info("sdfsdff" + jsonObject.toJSONString());
         ClampRecordModelDto c = clampMap.get(tHash);
         String hash = jsonObject.getString("result");
         if (StringUtils.isEmpty(hash)) return;

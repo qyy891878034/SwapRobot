@@ -16,6 +16,10 @@ public class BlockChainUtil {
         return "0x" + param.substring(24);
     }
 
+    public static String getParamFromAddress(String address) {
+        return address.substring(2);
+    }
+
     public static String getMethodByte(String method) {
         byte[] s = Hash.sha3(method.getBytes(StandardCharsets.UTF_8));
         String s1 = process(Integer.toHexString(s[0] & 0xFF));
