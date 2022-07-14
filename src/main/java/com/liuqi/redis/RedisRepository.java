@@ -19,6 +19,9 @@ public class RedisRepository {
     private RedisTemplate<String, Object> redisTemplate;
 
     /******common****************************************/
+    public void delAll(String key) {
+        redisTemplate.delete(redisTemplate.keys(key + "*"));
+    }
 
     /**
      * 指定key过期时间
@@ -285,6 +288,16 @@ public class RedisRepository {
     public String hGetString(String key, String item) {
         Object o = redisTemplate.opsForHash().get(key, item);
         return o != null ? o.toString() : null;
+    }
+
+    public BigDecimal hGetBigDecimal(String key, String item) {
+        Object o = this.redisTemplate.opsForHash().get(key, item);
+        return o != null ? new BigDecimal(o.toString()) : BigDecimal.ZERO;
+    }
+
+    public Integer hGetInteger(String key, String item) {
+        Object o = this.redisTemplate.opsForHash().get(key, item);
+        return o != null ? Integer.valueOf(o.toString()) : 0;
     }
 
     public Long hincreone(String key, String item) {
@@ -575,6 +588,23 @@ public class RedisRepository {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * 将list放入缓存
+     *
+     * @param key   键
+     * @param value 值
+     * @return 436
+     */
+    public boolean lPush(String key, Object value) {
+        try {
+            redisTemplate.opsForList().leftPush(key, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

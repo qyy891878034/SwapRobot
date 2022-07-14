@@ -9,7 +9,7 @@ import java.util.List;
  * 是否   0不是 1是
  */
 public enum YesNoEnum {
-    NO("不是", 0),
+    NO("否", 0),
     YES("是", 1);
 
     private String name;

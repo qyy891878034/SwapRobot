@@ -6,7 +6,7 @@ package com.liuqi.base;
  * 2017-8-10 下午12:01:45
  */
 public class BaseConstant{
-	public static final String BASE_PROJECT="SwapRobot";//项目名称
+	public static final String BASE_PROJECT="AutoTrade";//项目名称
 
 	//用户类型
 	public static final String TYPE_ADMIN="admin";

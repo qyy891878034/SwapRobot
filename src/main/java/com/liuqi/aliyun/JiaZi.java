@@ -1,17 +1,10 @@
 package com.liuqi.aliyun;
 
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.liuqi.business.constant.KeyConstant;
-import com.liuqi.business.constant.LockConstant;
-import com.liuqi.business.dto.SendTransactionResultDto;
-import com.liuqi.redis.lock.RedissonLockUtil;
-import com.liuqi.tron.AddressHelper;
 import okhttp3.*;
 import okio.ByteString;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.api.RLock;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Hash;
 import org.web3j.crypto.RawTransaction;

@@ -1,25 +1,11 @@
 package com.liuqi.utils;
 
-import com.liuqi.business.enums.ProtocolEnum;
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.crypto.ChildNumber;
-import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.crypto.HDKeyDerivation;
-import org.bitcoinj.crypto.MnemonicCode;
-import org.bitcoinj.params.MainNetParams;
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.crypto.Credentials;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 根据IP地址获取详细的地域信息

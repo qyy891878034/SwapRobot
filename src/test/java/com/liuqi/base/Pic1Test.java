@@ -3,11 +3,19 @@ package com.liuqi.base;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.db.SqlRunner;
 import cn.hutool.db.ds.simple.SimpleDataSource;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.liuqi.business.enums.ExchangeEnum;
+import com.liuqi.business.model.CurrencyConfigModelDto;
+import com.liuqi.business.service.CurrencyConfigService;
+import jnr.ffi.Struct;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,10 +27,16 @@ import java.util.Map;
  */
 public class Pic1Test extends BaseTest {
 
+    @Autowired
+    private CurrencyConfigService currencyConfigService;
 
     public static SqlRunner getRunner() {
-        DataSource ds = new SimpleDataSource("jdbc:mysql://127.0.0.1:3306/cost-effective", "root", "root");
+        DataSource ds = new SimpleDataSource("jdbc:mysql://127.0.0.1:3306/autotrade", "root", "123456");
         return SqlRunner.create(ds);
+    }
+
+    public void s() {
+
     }
 
     private static Map<String, JSONObject> picMaps = new HashMap<>();

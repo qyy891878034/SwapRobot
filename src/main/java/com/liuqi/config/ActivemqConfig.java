@@ -1,6 +1,5 @@
 package com.liuqi.config;
 
-import com.liuqi.business.constant.KeyConstant;
 import com.liuqi.business.constant.MqConstant;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
@@ -51,26 +50,87 @@ public class ActivemqConfig {
     }
 
     @Bean
-    public Destination queueInsertClampedData(){
+    public Destination queueInsertClampedData() {
         return new ActiveMQQueue(MqConstant.MQ_INSERT_CLAMPED_DATA);
     }
 
     @Bean
-    public Destination queueReconnectChainWs(){
+    public Destination queueInsertTransferRecord() {
+        return new ActiveMQQueue(MqConstant.MQ_INSERT_TRANSFER_RECORD);
+    }
+
+    @Bean
+    public Destination queueInsertLootBuy() {
+        return new ActiveMQQueue(MqConstant.MQ_INSERT_LOOT_BUY);
+    }
+
+    @Bean
+    public Destination queueInsertLootSell() {
+        return new ActiveMQQueue(MqConstant.MQ_INSERT_LOOT_SELL);
+    }
+
+    @Bean
+    public Destination queuePairCreateQuery() {
+        return new ActiveMQQueue(MqConstant.MQ_PAIR_CREATE_QUERY);
+    }
+
+    @Bean
+    public Destination queueTradeActionQuery() {
+        return new ActiveMQQueue(MqConstant.MQ_TRADE_ACTION_QUERY);
+    }
+
+    @Bean
+    public Destination queueLootBuyHashQuery() {
+        return new ActiveMQQueue(MqConstant.MQ_LOOT_BUY_HASH_QUERY);
+    }
+
+    @Bean
+    public Destination queueLootApproveHashQuery() {
+        return new ActiveMQQueue(MqConstant.MQ_LOOT_APPROVE_HASH_QUERY);
+    }
+
+    @Bean
+    public Destination queueLootSellCheckQuery() {
+        return new ActiveMQQueue(MqConstant.MQ_LOOT_SELL_CHECK_QUERY);
+    }
+
+    @Bean
+    public Destination queueLootSellHashQuery() {
+        return new ActiveMQQueue(MqConstant.MQ_LOOT_SELL_HASH_QUERY);
+    }
+
+    @Bean
+    public Destination queueReconnectChainWs() {
         return new ActiveMQQueue(MqConstant.MQ_RECONNECT_CHAIN_WS);
     }
 
     @Bean
-    public Destination queueTransaction1(){
+    public Destination queueQueryAddressNonce() {
+        return new ActiveMQQueue(MqConstant.MQ_QUERY_ADDRESS_NONCE);
+    }
+
+    @Bean
+    public Destination queueInsertDetectCurrency() {
+        return new ActiveMQQueue(MqConstant.MQ_INSERT_DETECT_ADDRESS);
+    }
+
+    @Bean
+    public Destination queueFreshBuyMin() {
+        return new ActiveMQQueue(MqConstant.MQ_FRESH_BUY_MIN);
+    }
+
+    @Bean
+    public Destination queueTransaction1() {
         return new ActiveMQQueue(MqConstant.MQ_DESTINATION_TRANSACTION1);
     }
+
     @Bean
-    public Destination queueTransaction2(){
+    public Destination queueTransaction2() {
         return new ActiveMQQueue(MqConstant.MQ_DESTINATION_TRANSACTION2);
     }
 
     @Bean
-    public Destination queueQueryNonce(){
+    public Destination queueQueryNonce() {
         return new ActiveMQQueue(MqConstant.MQ_DESTINATION_NONCE);
     }
 

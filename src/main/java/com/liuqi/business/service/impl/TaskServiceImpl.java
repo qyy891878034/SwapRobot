@@ -354,13 +354,11 @@ public class TaskServiceImpl implements TaskService {
      * @param jobName
      * @param jobGroup
      * @param description
-     * @param interval    延迟时间
      * @param params
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void addDelayedJob(String jobName, String jobGroup, String description, int interval,
-                              DateBuilder.IntervalUnit timeUnit, Map<String, Object> params) {
+    public void addDelayedJob(String jobName, String jobGroup, String description, Date date, Map<String, Object> params) {
         String createTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
         try {
             if (checkExists(jobName, jobGroup)) {
@@ -378,7 +376,7 @@ public class TaskServiceImpl implements TaskService {
             Trigger trigger = TriggerBuilder.newTrigger()
                     .withIdentity(triggerKey)
                     .withDescription(createTime) //创建时间
-                    .startAt(DateBuilder.futureDate(interval, timeUnit))
+                    .startAt(date)
                     .forJob(jobDetail)
                     .build();
 

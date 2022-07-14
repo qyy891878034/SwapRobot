@@ -813,6 +813,15 @@ public class DateUtil {
 		return null;
 	}
 
+	public static int getDayOfWeek(){
+		Calendar cal = Calendar.getInstance();
+		int week_index = cal.get(Calendar.DAY_OF_WEEK) - 1;
+		if(week_index <= 0){
+			week_index = 7;
+		}
+		return week_index;
+	}
+
 
 	// 获得当前月--结束日期
 	public static String getMaxMonthDate() {

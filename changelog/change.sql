@@ -131,3 +131,18 @@ CREATE TABLE `t_clamp_record`
     `hash`             varchar(300) DEFAULT '' COMMENT '夹的哈希',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `t_currency_config`
+(
+    `id`            bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `create_time`   datetime       DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`   datetime       DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+    `remark`        varchar(200)   DEFAULT '' COMMENT '备注',
+    `version`       int(11) DEFAULT '0' COMMENT '版本号',
+    `exchange_code` tinyint(2) DEFAULT 0 COMMENT '代码',
+    `currency_name` varchar(300)   DEFAULT '' COMMENT '币种',
+    `volume`        decimal(20, 8) DEFAULT 0 COMMENT '面值',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

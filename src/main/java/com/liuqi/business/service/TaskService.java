@@ -5,6 +5,7 @@ import com.liuqi.business.dto.TaskInfo;
 import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -75,11 +76,9 @@ public interface TaskService {
      * @param jobName
      * @param jobGroup
      * @param description
-     * @param interval    执行时间
      * @param params
      */
-    void addDelayedJob(String jobName, String jobGroup, String description, int interval, DateBuilder.IntervalUnit timeUnit,
-                       Map<String, Object> params);
+    void addDelayedJob(String jobName, String jobGroup, String description, Date date, Map<String, Object> params);
 
     /**
      * 获取状态

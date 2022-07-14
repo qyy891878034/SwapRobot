@@ -1,6 +1,6 @@
 package com.liuqi.business.dto.chain;
 
-import com.liuqi.business.enums.TradeStatusEnum;
+import com.liuqi.business.enums.StrategyEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -52,6 +52,6 @@ public class TxInfo implements Serializable {
     private String statusStr;
 
     public String getStatusStr() {
-        return TradeStatusEnum.getName(status);
+        return StrategyEnum.getName(status);
     }
 }

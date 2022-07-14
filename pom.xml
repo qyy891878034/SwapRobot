@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.liuqi</groupId>
-    <artifactId>robot</artifactId>
+    <artifactId>autotrade</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>robot</name>
+    <name>autotrade</name>
     <description>Demo project for Spring Boot</description>
 
     <parent>

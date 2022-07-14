@@ -7,6 +7,6 @@ import com.liuqi.business.model.ConfigModelDto;
 
 public interface ConfigMapper extends BaseMapper<ConfigModel,ConfigModelDto>{
 
-
     ConfigModelDto queryByName(String name);
+
 }
